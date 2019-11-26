@@ -18,12 +18,19 @@ use Illuminate\Http\Request;
 // });
 
 //all routes start wit v1 now (versioning)
-Route::prefix('v1')->group(function(){
-	//all routes for REST API
-	Route::apiResource('/user','Api\v1\UserController');
+Route::prefix('v1')->group(function () {
+	//we don't add login & register to group (auth) because here we're just getting the token, not using it
+	Route::post('login', 'Api\v1\UserController@login');
+	Route::post('register', 'Api\v1\UserController@register');
+	//use authentication for these routes
+	Route::group(['middleware' => 'auth:api'], function () {
+		// Route::post('details', 'Api\v1\UserController@details');
+		//all routes for REST API
+		Route::apiResource('/user', 'Api\v1\UserController');
+	});
 });
 
-Route::prefix('v2')->group(function(){
+Route::prefix('v2')->group(function () {
 	//all routes for REST API
-	Route::apiResource('/user','Api\v2\UserController')->only('show');
+	Route::apiResource('/user', 'Api\v2\UserController')->only('show');
 });
