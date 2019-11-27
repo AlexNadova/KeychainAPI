@@ -62,16 +62,25 @@ class UserController extends Controller
 		return response()->json(['success' => $success], $this->successStatus);
 	}
 
-
 	/**
 	 * Display one user.
-	 * @param User $user
-	 * @return \Illuminate\Http\Response
+	 * @param int $id
+	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function show(User $user)
+	public function show(int $id): \Illuminate\Http\JsonResponse
 	{
-		$user = Auth::user();
-		return response()->json(['data' => new UserResource($user)], $this->successStatus);
+		$authenticatedUser = Auth::user();
+		//get user by id taken from route (../api/v1/user/2)
+		$user = User::where('id', '=', $id)->first();
+		//if user doesn't exist, error
+		if ($user === null) {
+			return response()->json(['error' => 'User with this ID does not exist.'], 400);
+		} elseif ($authenticatedUser['id'] === $user['id']) {
+			return response()->json(['data' => new UserResource($authenticatedUser)], $this->successStatus);
+			//if id of current authenticated user and id taken from route (../api/v1/user/2) don't match, error
+		} else {
+			return response()->json(['error' => 'Given ID does not match with logged user.'], 400);
+		}
 	}
 
 	/**
