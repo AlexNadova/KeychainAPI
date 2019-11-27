@@ -28,7 +28,7 @@ class UserController extends Controller
 			return response()->json(['error' => 'Unauthorised'], 401);
 		}
 	}
-	
+
 	/** 
 	 * Register api 
 	 * 
@@ -75,47 +75,49 @@ class UserController extends Controller
 	}
 
 	/**
-	 * Display all users
-	 *
-	 * @return UserCollectionResource
+	 * @param int $id, Request $request
+	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function index(): UserCollectionResource
+	public function update(int $id, Request $request): \Illuminate\Http\JsonResponse
 	{
-		// $users = User::paginate(5); //how many rows per page
-		// return UserResource::collection($users); //take created resource and return it as collection
-		return new UserCollectionResource(User::paginate(10));
-	}
-
-	/**
-	 * create new user
-	 * 
-	 * @param Request $request
-	 * @return UserResource
-	 */
-	public function store(Request $request): UserResource
-	{
-		//validaation: these fields must be given
-		$request->validate([
-			'name' => 'required',
-			'surname' => 'required',
-			'email' => 'required',
-			'password' => 'required', // password
+		//validation: these fields must be given
+		$validator = Validator::make($request->all(), [
+			'name' => 'regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
+			'surname' => 'regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
+			'email' => 'string|email',
+			'password' => 'regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/|string',
+			'c_password' => 'same:password',
 		]);
-		//create new user
-		$user = user::create($request->all());
-		//return that user
-		return new UserResource($user);
-	}
+		//if validation fails, send error response
+		if ($validator->fails()) {
+			return response()->json(['error' => $validator->errors()], 401);
+		}
+		$authenticatedUser = Auth::user();
 
-	/**
-	 * @param User $user, Request $request
-	 * @return UserResource
-	 */
-	public function update(User $user, Request $request): UserResource
-	{
-		//update user
-		$user->update($request->all());
-		return new UserResource($user);
+		if (isset($request['email'])) {
+			//get user from db that is not current user and has given email - if doesn't exist = null
+			$checkEmail = User::where([
+				['email', '=', $request["email"]],
+				['id', '<>', $authenticatedUser['id']]
+			])->first();
+			//if user with given email exist, error
+			if ($checkEmail !== null) {
+				//if user doesn't exist, error
+				return response()->json(['error' => 'This email is already in use.'], 400);
+			}
+		}
+
+		if (User::where('id', '=', $id)->first() === null) {
+			return response()->json(['error' => 'User with this ID does not exist.'], 400);
+		} elseif ($authenticatedUser['id'] === $id) {
+			if (isset($request['password'])) {
+				$request['password'] = bcrypt($request['password']);
+			}
+			$authenticatedUser->update($request->all());
+			return response()->json(['data' => new UserResource($authenticatedUser)], $this->successStatus);
+		} else {
+			return response()->json(['error' => 'Given ID does not match with logged user.'], 400);
+		}
 	}
 
 	/**
