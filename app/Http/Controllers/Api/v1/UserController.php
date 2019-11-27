@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
 use App\Http\Resources\UserResource;
-use App\Http\Resources\UserCollectionResource;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 
@@ -33,34 +32,35 @@ class UserController extends Controller
 	 * Register api 
 	 * 
 	 * @param Request $request
-	 * @return \Illuminate\Http\Response 
+	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function register(Request $request)
+	public function register(Request $request): \Illuminate\Http\JsonResponse
 	{
-		//validate given data
+		//validation: these fields must be given
 		$validator = Validator::make($request->all(), [
-			'name' => 'required',
-			'surname' => 'required',
-			'email' => 'required|email',
-			'password' => 'required',
+			'name' => 'required|regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
+			'surname' => 'required|regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
+			'email' => 'required|string|unique:users,email|email',
+			'password' => 'required|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/|string',
 			'c_password' => 'required|same:password',
 		]);
 		//if validation fails, send error response
 		if ($validator->fails()) {
 			return response()->json(['error' => $validator->errors()], 401);
 		}
-
 		$input = $request->all();
-		//incript password
+		//hash password with L Hash facade (authController takes care of veryfying Bcrypt 
+		//password against the un-hashed version provided by user)
 		$input['password'] = bcrypt($input['password']);
 		//create user
 		$user = User::create($input);
-		//create token for this user
-		$success['token'] =  $user->createToken('MyApp')->accessToken;
+		//create token named eddie for this user
+		$success['token'] =  $user->createToken('eddie')->accessToken;
 		$success['name'] =  $user->name;
 		//return user name and token
 		return response()->json(['success' => $success], $this->successStatus);
 	}
+
 
 	/**
 	 * Display one user.

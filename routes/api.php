@@ -22,11 +22,11 @@ Route::prefix('v1')->group(function () {
 	//we don't add login & register to group (auth) because here we're just getting the token, not using it
 	Route::post('login', 'Api\v1\UserController@login');
 	Route::post('register', 'Api\v1\UserController@register');
-	//use authentication for these routes
+	//use authentication middleware to protect these routes
 	Route::group(['middleware' => 'auth:api'], function () {
 		// Route::post('details', 'Api\v1\UserController@details');
-		//all routes for REST API
-		Route::apiResource('/user', 'Api\v1\UserController');
+		//all routes for REST API, exclude create because we have register for that
+		Route::apiResource('/user', 'Api\v1\UserController')->except(['store', 'index']);
 	});
 });
 
