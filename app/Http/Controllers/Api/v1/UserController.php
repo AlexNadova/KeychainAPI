@@ -16,18 +16,19 @@ class UserController extends Controller
 	/** 
 	 * login api 
 	 * 
-	 * @return \Illuminate\Http\Response 
+	 * @return \Illuminate\Http\JsonResponse 
 	 */
-	public function login()
+	public function login(): \Illuminate\Http\JsonResponse
 	{
 		if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
 			$user = Auth::user();
-			$success['token'] =  $user->createToken('MyApp')->accessToken;
+			$success['token'] =  $user->createToken('eddie')->accessToken;
 			return response()->json(['success' => $success], $this->successStatus);
 		} else {
 			return response()->json(['error' => 'Unauthorised'], 401);
 		}
 	}
+	
 	/** 
 	 * Register api 
 	 * 
