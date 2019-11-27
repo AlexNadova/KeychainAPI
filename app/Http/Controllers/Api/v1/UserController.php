@@ -121,14 +121,21 @@ class UserController extends Controller
 	}
 
 	/**
-	 * @param User $user
-	 * @return \Illuminate\Http\JsonResource
-	 * @throws \Exception
+	 * @param int $id
+	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function destroy(User $user)
+	public function destroy(int $id): \Illuminate\Http\JsonResponse
 	{
-		$user->delete();
+		$authenticatedUser = Auth::user();
 
-		return response()->json();
+		//if user doesn't exist, error
+		if (User::where('id', '=', $id)->first() === null) {
+			return response()->json(['error' => 'User with this ID does not exist.'], 400);
+		} elseif ($authenticatedUser['id'] === $id) {
+			$authenticatedUser->delete();
+			return response()->json(['success' => 'User was deleted successfully'], $this->successStatus);
+		} else {
+			return response()->json(['error' => 'Given ID does not match with logged user.'], 400);
+		}
 	}
 }
