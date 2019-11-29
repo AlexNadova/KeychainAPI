@@ -14,13 +14,16 @@ class LoginResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        // return parent::toArray($request);
 
-        /* return [
+        return [
             "id" => $this->id,
             "websiteName" => $this->websiteName,
             "websiteAddress" => $this->websiteAddress,
-            'userName' => $this->userName
-        ]; */
+            'userName' => $this->userName,
+            'password' => $this->password,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ]; 
     }
 }

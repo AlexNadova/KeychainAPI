@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Login extends Model
 {
-    // Customize the names of the columns used to store the timestamps.
-    //const CREATED_AT = 'created';
-    //const UPDATED_AT = 'last_modified';
+    // protected $primaryKey = 'id';
 
     /**
      * The attributes that are mass assignable.
@@ -21,4 +19,8 @@ class Login extends Model
         'userName',
         'password'
     ];
+
+    /* public function user() {
+        return $this->belongsTo(User::class);
+    } */
 }

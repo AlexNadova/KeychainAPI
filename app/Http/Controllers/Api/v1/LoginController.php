@@ -31,15 +31,19 @@ class LoginController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation: Required fields.
+        /**
+         * Validate incoming request.
+         * If the validation fails, an exception will be thrown 
+         * and a proper error response/ message will be sent back to the user.
+         */
         $request->validate([
-            'websiteName'    => ['required', 'string', 'max:255'],
-            'websiteAddress' => ['required', 'string', 'max:255'],
+            'websiteName'    => ['unique:logins', 'required', 'string', 'max:255'],
+            'websiteAddress' => ['required', 'string', 'max:255', 'url'],
             'userName'       => ['required', 'string', 'max:255'],
             'password'       => ['required', 'string', 'max:255']
         ]);
 
-        // Hash or encrypt password!
+        // Encrypt password!
 
         // Create a new login.
         $login = Login::create($request->all());
@@ -77,7 +81,17 @@ class LoginController extends Controller
      */
     public function update(Login $login, Request $request): LoginResource
     {
-        // Validation her. (Assuming that the user is passing something as a string)
+        /**
+         * Validate incoming request.
+         * If the validation fails, an exception will be thrown 
+         * and a proper error response/ message will be sent back to the user.
+         */
+        $request->validate([
+            'websiteName'    => ['unique:logins', 'string', 'max:255'],
+            'websiteAddress' => ['string', 'max:255', 'url'],
+            'userName'       => ['string', 'max:255'],
+            'password'       => ['string', 'max:255']
+        ]);
 
         // Update the login
         $login->update($request->all());
