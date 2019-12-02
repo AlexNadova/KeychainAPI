@@ -27,6 +27,7 @@ Route::prefix('v1')->group(function () {
 		// Route::post('details', 'Api\v1\UserController@details');
 		//all routes for REST API, exclude create because we have register for that
 		Route::apiResource('/user', 'Api\v1\UserController')->except(['store', 'index']);
+		Route::get('/logout','Api\v1\UserController@logout');
 	});
 });
 
