@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\v2\LoginResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class LoginCollectionResource extends ResourceCollection
@@ -14,6 +15,10 @@ class LoginCollectionResource extends ResourceCollection
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            //'data' => LoginResource::collection($this->collection),
+            'data' => $this->collection,
+            'meta' => ['login_count' => $this->collection->count()]
+        ];
     }
 }

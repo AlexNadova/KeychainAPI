@@ -15,6 +15,8 @@ class CreateLoginsTable extends Migration
     {
         Schema::create('logins', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('user_id')->unsigned(); //->index()->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('websiteName');
             $table->string('websiteAddress');
             $table->string('userName');

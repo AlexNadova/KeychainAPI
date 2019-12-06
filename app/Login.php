@@ -14,13 +14,15 @@ class Login extends Model
      * @var array
      */
     protected $fillable = [
+        'user_id',
         'websiteName',
         'websiteAddress',
         'userName',
         'password'
     ];
 
-    /* public function user() {
-        return $this->belongsTo(User::class);
-    } */
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }

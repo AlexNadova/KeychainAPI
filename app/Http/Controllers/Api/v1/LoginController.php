@@ -20,6 +20,7 @@ class LoginController extends Controller
     public function index(): LoginCollectionResource
     {
         return new LoginCollectionResource(Login::paginate());
+        //return LoginResource::collection(Login::paginate());
     }
 
     /**
@@ -46,13 +47,15 @@ class LoginController extends Controller
         // Encrypt password!
 
         // Create a new login.
-        $login = Login::create($request->all());
-        /* $login = Login::create([
+        //$login = Login::create($request->all());
+        $login = Login::create([
+            'user_id' => $request->user()->id,
             'websiteName' => $request['websiteName'],
             'websiteAddress' => $request['websiteAddress'],
             'userName' => $request['userName'],
+            // Don't hash password, Encrypt.
             'password' => HASH::make($request['password'])
-        ]); */
+        ]);
 
         return new LoginResource($login);
     }
@@ -81,6 +84,11 @@ class LoginController extends Controller
      */
     public function update(Login $login, Request $request): LoginResource
     {
+        // Check if currently authenticated user is the owner of the login
+        if ($request->user()->id !== $login->user_id) {
+            return response()->json(['error' => 'You can only edit your own login.'], 403);
+        }
+
         /**
          * Validate incoming request.
          * If the validation fails, an exception will be thrown 
@@ -94,14 +102,11 @@ class LoginController extends Controller
         ]);
 
         // Update the login
-        $login->update($request->all());
+        //$login->update($request->all());
+        $login->update($request->only(['websiteName', 'websiteName', 'websiteAddress', 'userName', 'password']));
 
         // Return the updated login.
         return new LoginResource($login);
-
-        /* return (new LoginResource($login))
-        ->response()
-        ->setStatusCode(202); */
     }
 
     /**
@@ -120,6 +125,6 @@ class LoginController extends Controller
         $login->delete();
 
         // Return an empty array
-        return response()->json();
+        return response()->json(null . 204);
     }
 }

@@ -37,4 +37,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the logins for the user.
+     */
+    public function logins()
+    {
+        return $this->hasMany('App\Login');
+    }
 }
