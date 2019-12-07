@@ -32,6 +32,9 @@
         }
     },
     "autoload": {
+		"files":[
+			"app/Helpers/httpStatusConstants.php"
+		],
         "psr-4": {
             "App\\": "app/"
         },

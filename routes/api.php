@@ -26,7 +26,9 @@ Route::prefix('v1')->group(function () {
 	Route::group(['middleware' => 'auth:api'], function () {
 		// Route::post('details', 'Api\v1\UserController@details');
 		//all routes for REST API, exclude create because we have register for that
-		Route::apiResource('/user', 'Api\v1\UserController')->except(['store', 'index']);
+		Route::get('/user','Api\v1\UserController@show');
+		Route::put('/user','Api\v1\UserController@update');
+		Route::delete('/user','Api\v1\UserController@destroy');
 		Route::get('/logout','Api\v1\UserController@logout');
 		Route::apiResource('/logins', 'Api\v1\LoginController');
 	});
