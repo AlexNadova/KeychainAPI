@@ -16,7 +16,9 @@ class LoginResource extends JsonResource
     public function toArray($request)
     {
         return [
+            // Don't display id and user_id in deployment.
             "id" => $this->id,
+            "user_id" => $this->user_id,
             "websiteName" => $this->websiteName,
             "websiteAddress" => $this->websiteAddress,
             'userName' => $this->userName,
@@ -24,7 +26,8 @@ class LoginResource extends JsonResource
             'created_at' => (string) $this->created_at,
             'updated_at' => (string) $this->updated_at,
 
-            'user' => $this->user,
+            // Display the user/ owner for every login. 
+            //'user' => $this->user,
         ];
     }
 }

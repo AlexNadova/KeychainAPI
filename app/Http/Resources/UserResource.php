@@ -22,7 +22,10 @@ class UserResource extends JsonResource
       'email_verified_at' => $this->email_verified_at,
       'created_at' => (string) $this->created_at,
       'updated_at' => (string) $this->updated_at,
-      'logins' => new LoginCollectionResource($this->logins),
+      // Will not decrypt the users logins, but will display the owner only once for all logins.
+      //'logins' => new LoginCollectionResource($this->logins),
+      // Will decrypt the users logins, but will also display the owner in every login.
+      'logins' => LoginResource::collection($this->logins),
     ];
     // return parent::toArray($request);
   }

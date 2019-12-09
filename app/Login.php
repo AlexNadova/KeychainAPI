@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
 
 class Login extends Model
 {
@@ -24,5 +25,36 @@ class Login extends Model
     public function user()
     {
         return $this->belongsTo('App\User');
+    }
+
+    // Get
+    public function getUserNameAttribute($value)
+    {
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return $value;
+        }
+    }
+
+    public function getPasswordAttribute($value)
+    {
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return $value;
+        }
+    }
+
+    // Set
+
+    public function setUserNameAttribute($value)
+    {
+        $this->attributes['userName'] = Crypt::encryptString($value);
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Crypt::encryptString($value);
     }
 }

@@ -7,10 +7,14 @@ use App\Http\Resources\LoginCollectionResource;
 use Illuminate\Http\Request;
 use App\Login;
 use App\Http\Resources\LoginResource;
-use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     /**
      * INDEX
      * Display a listing of the logins.
@@ -44,17 +48,13 @@ class LoginController extends Controller
             'password'       => ['required', 'string', 'max:255']
         ]);
 
-        // Encrypt password!
-
         // Create a new login.
-        //$login = Login::create($request->all());
         $login = Login::create([
             'user_id' => $request->user()->id,
             'websiteName' => $request['websiteName'],
             'websiteAddress' => $request['websiteAddress'],
             'userName' => $request['userName'],
-            // Don't hash password, Encrypt.
-            'password' => HASH::make($request['password'])
+            'password' => $request['password'],
         ]);
 
         return new LoginResource($login);
@@ -82,7 +82,7 @@ class LoginController extends Controller
      * @param   Request $request  [$request description]
      * @return  LoginResource     [return description]
      */
-    public function update(Login $login, Request $request): LoginResource
+    public function update(Login $login, Request $request) //: LoginResource
     {
         // Check if currently authenticated user is the owner of the login
         if ($request->user()->id !== $login->user_id) {
@@ -102,7 +102,6 @@ class LoginController extends Controller
         ]);
 
         // Update the login
-        //$login->update($request->all());
         $login->update($request->only(['websiteName', 'websiteName', 'websiteAddress', 'userName', 'password']));
 
         // Return the updated login.
@@ -124,7 +123,6 @@ class LoginController extends Controller
         // Delete the login
         $login->delete();
 
-        // Return an empty array
         return response()->json(null . 204);
     }
 }
