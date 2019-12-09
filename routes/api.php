@@ -22,15 +22,26 @@ Route::prefix('v1')->group(function () {
 	//we don't add login & register to group (auth) because here we're just getting the token, not using it
 	Route::post('login', 'Api\v1\UserController@login');
 	Route::post('register', 'Api\v1\UserController@register');
+	//password reset:
+	Route::group([
+		'namespace' => 'Auth',
+		'middleware' => 'api',
+		'prefix' => 'password'
+	], function(){
+		Route::post('create','PasswordResetController@create');
+		Route::get('find/{token}','PasswordResetController@find');
+		Route::post('reset','PasswordResetController@reset');
+
+	});
 	//use authentication middleware to protect these routes
 	Route::group(['middleware' => 'auth:api'], function () {
 		// Route::post('details', 'Api\v1\UserController@details');
 		//all routes for REST API, exclude create because we have register for that
-		Route::get('/user','Api\v1\UserController@show');
-		Route::put('/user','Api\v1\UserController@update');
-		Route::delete('/user','Api\v1\UserController@destroy');
-		Route::get('/logout','Api\v1\UserController@logout');
-		Route::apiResource('/logins', 'Api\v1\LoginController');
+		Route::get('user','Api\v1\UserController@show');
+		Route::put('user','Api\v1\UserController@update');
+		Route::delete('user','Api\v1\UserController@destroy');
+		Route::get('logout','Api\v1\UserController@logout');
+		Route::apiResource('logins', 'Api\v1\LoginController');
 	});
 });
 
