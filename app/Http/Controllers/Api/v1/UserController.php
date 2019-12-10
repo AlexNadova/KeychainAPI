@@ -24,7 +24,7 @@ class UserController extends Controller
 			$success['token'] =  $user->createToken('eddie')->accessToken;
 			return response()->json(['success' => $success], HttpStatus::STATUS_OK);
 		} else {
-			return response()->json(['error' => 'Unauthorized'], HttpStatus::STATUS_UNAUTHORIZED);
+			return response()->json(['error' => 'User could not be authenticated.'], HttpStatus::STATUS_UNAUTHORIZED);
 		}
 	}
 
@@ -62,8 +62,13 @@ class UserController extends Controller
 		$input['password'] = bcrypt($input['password']);
 		//create user
 		$user = User::create($input);
-		//return user name and token
-		return response()->json(['success' => 'User was created.'], HttpStatus::STATUS_CREATED);
+		if ($user){
+			//return user name and token
+			return response()->json(['success' => 'User was created.'], HttpStatus::STATUS_CREATED);
+		}else{
+			return response()->json(['error' => 'User could not be registered.'], HttpStatus::STATUS_INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 	/**
@@ -74,10 +79,9 @@ class UserController extends Controller
 	{
 		$authenticatedUser = Auth::user();
 		if($authenticatedUser){
-			$user = User::where('id', '=', $authenticatedUser['id'])->first();
 			return response()->json(['data' => new UserResource($authenticatedUser)], HttpStatus::STATUS_OK);
 		}else{
-			return response()->json(['error' => 'Unauthorized'], HttpStatus::STATUS_UNAUTHORIZED);
+			return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
 		}
 	}
 
@@ -118,7 +122,7 @@ class UserController extends Controller
 				'data' => new UserResource($authenticatedUser)
 			], HttpStatus::STATUS_OK);
 		}else{
-			return response()->json(['error' => 'Unauthorized'], HttpStatus::STATUS_UNAUTHORIZED);
+			return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
 		}
 	}
 
@@ -134,7 +138,7 @@ class UserController extends Controller
 			DB::table('oauth_access_tokens')->where('user_id', $authenticatedUser['id'])->delete();
 			return response()->json(['success' => 'User was deleted successfully.'], HttpStatus::STATUS_OK);
 		}else{
-			return response()->json(['error' => 'Unauthorized'], HttpStatus::STATUS_UNAUTHORIZED);
+			return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
 		}
 	}
 }

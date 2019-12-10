@@ -18,7 +18,7 @@ class Login extends Model
         'user_id',
         'websiteName',
         'websiteAddress',
-        'userName',
+        'username',
         'password'
     ];
 
@@ -50,7 +50,7 @@ class Login extends Model
 
     public function setUserNameAttribute($value)
     {
-        $this->attributes['userName'] = Crypt::encryptString($value);
+        $this->attributes['username'] = Crypt::encryptString($value);
     }
 
     public function setPasswordAttribute($value)

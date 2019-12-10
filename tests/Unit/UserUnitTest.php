@@ -505,9 +505,9 @@ class UserUnitTests extends UserTestCase
 			'email' => 'wrongmail@website.sk',
 			'password' => 'SafePassword1'
 			]);
-		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
+		$response->assertStatus(HttpStatus::STATUS_FORBIDDEN);
 		$response->assertJson([
-			'error' => 'Unauthorized',
+			'error' => 'User could not be authenticated.',
 		]);
 	}
 
@@ -525,9 +525,9 @@ class UserUnitTests extends UserTestCase
 			'email' => $user->email,
 			'password' => 'wrongformatpassword'
 			]);
-		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
+		$response->assertStatus(HttpStatus::STATUS_FORBIDDEN);
 		$response->assertJson([
-			'error' => 'Unauthorized',
+			'error' => 'User could not be authenticated.',
 		]);
 	}
 
@@ -596,9 +596,9 @@ class UserUnitTests extends UserTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->get($this->route.'/user');
-		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
+		$response->assertStatus(HttpStatus::STATUS_FORBIDDEN);
 		$response->assertJson([
-			'message' => 'Unauthenticated.',
+			'message' => 'You cannot access this resource..',
 		]);
 	}
 	
@@ -631,9 +631,9 @@ class UserUnitTests extends UserTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json'
 		])->delete($this->route.'/user');
-		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
+		$response->assertStatus(HttpStatus::STATUS_FORBIDDEN);
 		$response->assertJson([
-			'message' => 'Unauthenticated.'
+			'message' => 'You cannot access this resource..'
 		]);
 	}
 
