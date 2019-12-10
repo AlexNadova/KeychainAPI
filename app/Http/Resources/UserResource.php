@@ -25,7 +25,7 @@ class UserResource extends JsonResource
       // Will not decrypt the users logins, but will display the owner only once for all logins.
       //'logins' => new LoginCollectionResource($this->logins),
       // Will decrypt the users logins, but will also display the owner in every login.
-      'logins' => LoginResource::collection($this->logins),
+      //'logins' => LoginResource::collection($this->logins),
     ];
     // return parent::toArray($request);
   }
