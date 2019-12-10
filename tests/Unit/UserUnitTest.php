@@ -664,9 +664,9 @@ class UserUnitTests extends UserTestCase
 				'name' => 'UpdatedName',
 				'surname' => 'UpdatedSurname',
 				'email' => 'updated.email@website.com',
-				'email_verified_at' => $user->email_verified_at->jsonSerialize(),
-				'created_at' => $user->created_at->jsonSerialize(),
-				'updated_at' => $user->updated_at->jsonSerialize(),
+				'email_verified_at' => $user->email_verified_at->format('Y-m-d H:i:s'),
+				'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+				'updated_at' => $user->updated_at->format('Y-m-d H:i:s'),
 			]
 		]);
 	}
@@ -716,9 +716,9 @@ class UserUnitTests extends UserTestCase
 				'name' => $user->name,
 				'surname' => $user->surname,
 				'email' => $user->email,
-				'email_verified_at' => $user->email_verified_at->jsonSerialize(),
-				'created_at' => $user->created_at->jsonSerialize(),
-				'updated_at' => $user->updated_at->jsonSerialize(),
+				'email_verified_at' => $user->email_verified_at->format('Y-m-d H:i:s'),
+				'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+				'updated_at' => $user->updated_at->format('Y-m-d H:i:s'),
 			]
 		]);
 	}

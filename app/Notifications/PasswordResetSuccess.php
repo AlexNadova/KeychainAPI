@@ -13,13 +13,10 @@ class PasswordResetSuccess extends Notification
 
     /**
      * Create a new notification instance.
-     *
      * @return void
      */
     public function __construct()
-    {
-        //
-    }
+    { }
 
     /**
      * Get the notification's delivery channels.
@@ -53,8 +50,6 @@ class PasswordResetSuccess extends Notification
      */
     public function toArray($notifiable)
     {
-        return [
-            //
-        ];
+        return [ ];
     }
 }

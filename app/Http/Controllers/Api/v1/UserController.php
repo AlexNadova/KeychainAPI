@@ -15,7 +15,6 @@ class UserController extends Controller
 {
 	/** 
 	 * login api 
-	 * 
 	 * @return \Illuminate\Http\JsonResponse 
 	 */
 	public function login(): \Illuminate\Http\JsonResponse
@@ -29,6 +28,10 @@ class UserController extends Controller
 		}
 	}
 
+	/** 
+	 * logout api 
+	 * @return \Illuminate\Http\JsonResponse 
+	 */
 	public function logout(): \Illuminate\Http\JsonResponse{
 		$userToken = Auth::user()->token();
 		$userToken->revoke();
@@ -41,8 +44,7 @@ class UserController extends Controller
 
 	/** 
 	 * Register api 
-	 * 
-	 * @param Request $request
+	 * @param Request $request (string: name, surname, email, password, c_password)
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function register(Request $request): \Illuminate\Http\JsonResponse
@@ -66,7 +68,6 @@ class UserController extends Controller
 
 	/**
 	 * Display one user.
-	 * @param
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function show(): \Illuminate\Http\JsonResponse
@@ -81,7 +82,7 @@ class UserController extends Controller
 	}
 
 	/**
-	 * @param Request $request
+	 * @param Request $request (string: name|surname|email|password|c_password)
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function update(Request $request): \Illuminate\Http\JsonResponse
@@ -101,17 +102,16 @@ class UserController extends Controller
 					['email', '=', $request["email"]],
 					['id', '<>', $authenticatedUser['id']]
 				])->first();
-				//if user with given email exist, error
+				//if user with given email doesn't exist, error
 				if ($user !== null) {
-					//if user doesn't exist, error
 					return response()->json(['error' => 'This email is already in use.'], HttpStatus::STATUS_BAD_REQUEST);
 				}
 			}
-
+			//if password is given, hash it
 			if (isset($request['password'])) {
 				$request['password'] = bcrypt($request['password']);
 			}
-
+			//update user
 			$authenticatedUser->update($request->all());
 			return response()->json([
 				'message' => 'User was updated.',
@@ -123,6 +123,7 @@ class UserController extends Controller
 	}
 
 	/**
+	 * delete user
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function destroy(): \Illuminate\Http\JsonResponse

@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function () {
 		'prefix' => 'password'
 	], function(){
 		Route::post('create','PasswordResetController@create');
-		Route::get('find/{token}','PasswordResetController@find');
+		// Route::get('find/{token}','PasswordResetController@find');
 		Route::post('reset','PasswordResetController@reset');
 
 	});
@@ -40,7 +40,7 @@ Route::prefix('v1')->group(function () {
 		Route::get('user','Api\v1\UserController@show');
 		Route::put('user','Api\v1\UserController@update');
 		Route::delete('user','Api\v1\UserController@destroy');
-		Route::get('logout','Api\v1\UserController@logout');
+		Route::delete('logout','Api\v1\UserController@logout');
 		Route::apiResource('logins', 'Api\v1\LoginController');
 	});
 });
