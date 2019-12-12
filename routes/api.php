@@ -31,8 +31,10 @@ Route::prefix('v1')->group(function () {
 		Route::post('create','PasswordResetController@create');
 		// Route::get('find/{token}','PasswordResetController@find');
 		Route::post('reset','PasswordResetController@reset');
-
 	});
+	//!!! email verification: probably will need remake after frontend is implemented
+	Route::post('email/verify','Auth\VerificationController@verify');
+
 	//use authentication middleware to protect these routes
 	Route::group(['middleware' => 'auth:api'], function () {
 		// Route::post('details', 'Api\v1\UserController@details');
@@ -42,6 +44,7 @@ Route::prefix('v1')->group(function () {
 		Route::delete('user','Api\v1\UserController@destroy');
 		Route::delete('logout','Api\v1\UserController@logout');
 		Route::apiResource('logins', 'Api\v1\LoginController');
+		Route::post('email/update','Auth\VerificationController@update');
 	});
 });
 
