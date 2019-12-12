@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\User;
+use App\EmailVerification;
 use App\Http\Resources\UserResource;
 use App\Helpers\HttpStatus;
+use App\Notifications\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -19,6 +21,12 @@ class UserController extends Controller
 	 */
 	public function login(): \Illuminate\Http\JsonResponse
 	{
+		$user = User::where([
+			['email', '=', request('email')]
+		])->first();
+		if (is_null($user['email_verified_at'])){
+			return response()->json(['error' => 'You first need to verify your email.'], HttpStatus::STATUS_FORBIDDEN);
+		}
 		if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
 			$user = Auth::user();
 			$success['token'] =  $user->createToken('eddie')->accessToken;
@@ -62,7 +70,13 @@ class UserController extends Controller
 		$input['password'] = bcrypt($input['password']);
 		//create user
 		$user = User::create($input);
-		if ($user){
+		$emailVerify = EmailVerification::updateOrCreate([
+			'user_id' => $user['id'],
+			'token' => Str::random(60),
+			'email_update' => $user['email']
+		]);
+		if ($user && $emailVerify){
+			$user->notify(new EmailVerificationRequest($emailVerify->token));
 			//return user name and token
 			return response()->json(['success' => 'User was created.'], HttpStatus::STATUS_CREATED);
 		}else{
@@ -86,7 +100,7 @@ class UserController extends Controller
 	}
 
 	/**
-	 * @param Request $request (string: name|surname|email|password|c_password)
+	 * @param Request $request (string: name|surname|password|c_password)
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function update(Request $request): \Illuminate\Http\JsonResponse
@@ -94,23 +108,11 @@ class UserController extends Controller
 		$request->validate([
 			'name' => 'regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
 			'surname' => 'regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
-			'email' => 'string|email',
 			'password' => 'regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})(?!.*[^a-zA-Z0-9]).{8,}/|string',
 			'c_password' => 'same:password',
 		]);
 		$authenticatedUser = Auth::user();
 		if($authenticatedUser){
-			if (isset($request['email'])) {
-				//get user from db that is not current user and has given email - if doesn't exist = null
-				$user = User::where([
-					['email', '=', $request["email"]],
-					['id', '<>', $authenticatedUser['id']]
-				])->first();
-				//if user with given email doesn't exist, error
-				if ($user !== null) {
-					return response()->json(['error' => 'This email is already in use.'], HttpStatus::STATUS_BAD_REQUEST);
-				}
-			}
 			//if password is given, hash it
 			if (isset($request['password'])) {
 				$request['password'] = bcrypt($request['password']);

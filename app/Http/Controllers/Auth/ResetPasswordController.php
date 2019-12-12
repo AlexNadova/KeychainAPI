@@ -15,7 +15,6 @@ class PasswordResetController extends Controller
 {
     /**
      * Create token password reset
-     *
      * @param  Request $request (string : $email)
      * @return \Illuminate\Http\JsonResponse
      */
@@ -39,17 +38,16 @@ class PasswordResetController extends Controller
 		//if user and passwordReset exits, send email (notify) and return message
 		if ($user && $passwordReset){
 			$user->notify(new PasswordResetRequest($passwordReset->token));
-			return response()->json(['message' => 'We have e-mailed your password reset link!'], HttpStatus::STATUS_OK);
+			return response()->json(['message' => 'We have e-mailed you your password reset link!'], HttpStatus::STATUS_OK);
 		}
 	}
 	
 	/**
      * Reset password
-     *
      * @param  Request $request (string: email, password, c_password, token)
-     * @return [json] user object
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function reset(Request $request)
+    public function reset(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'email' => 'required|string|email',
