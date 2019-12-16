@@ -17,8 +17,7 @@ class LoginCollectionResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection,
-            'meta' => ['login_count' => $this->collection->count()]
+            'data' => $this->collection
         ];
     }
 }

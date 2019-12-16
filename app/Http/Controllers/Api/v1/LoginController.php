@@ -21,7 +21,15 @@ class LoginController extends Controller
      */
     public function index(): \Illuminate\Http\JsonResponse
     {
-		return response()->json(['data' => LoginCollectionResource(Login::paginate())], HttpStatus::STATUS_OK);
+		$authenticatedUser = Auth::user();
+
+		$logins = Login::where([
+			['user_id', '=', $authenticatedUser->id]
+		])->paginate(5);
+		if ($logins->total() === 0){
+			return response()->json(['error' => 'User does not own any logins.'], HttpStatus::STATUS_BAD_REQUEST);
+		}
+		return response()->json($logins, HttpStatus::STATUS_OK);
     }
 
     /**
@@ -37,7 +45,7 @@ class LoginController extends Controller
          * and a proper error response/ message will be sent back to the user.
          */
         $request->validate([
-            'websiteName'    => ['required', 'string', 'max:255'],
+            'websiteName'    => ['required', 'string', 'max:30'],
             'websiteAddress' => ['required', 'string', 'max:255', 'url'],
             'username'       => ['required', 'string', 'max:255'],
             'password'       => ['required', 'string', 'max:255']
@@ -59,14 +67,20 @@ class LoginController extends Controller
 
     /**
      * Display the specified login.
-     * @param   Login $login
+     * @param   int $id
      * @return  \Illuminate\Http\JsonResponse
      */
-    public function show(Login $login): \Illuminate\Http\JsonResponse
+    public function show(int $id): \Illuminate\Http\JsonResponse
     {
+		$login = Login::where([
+			['id', '=', $id]
+		])->first();
+		if (!$login){
+            return response()->json(['error' => 'Resource does not exist.'], HttpStatus::STATUS_BAD_REQUEST);
+		}
 		$authenticatedUser = Auth::user();
         // Check if currently authenticated user is the owner of the login
-        if (!$authenticatedUser || $authenticatedUser['id'] !== $login->user_id) {
+        if (!$authenticatedUser || $authenticatedUser['id'] !== $login['user_id']) {
             return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
         }
 		return response()->json(['data' => new LoginResource($login)], HttpStatus::STATUS_OK);
@@ -75,19 +89,25 @@ class LoginController extends Controller
 
     /**
      * Update the specified login in storage.
-     * @param   Login   $login
+     * @param   int $id
      * @param   Request $request (string: websiteName, websiteAddress, username, password)
      * @return  \Illuminate\Http\JsonResponse
      */
-    public function update(Login $login, Request $request): \Illuminate\Http\JsonResponse
+    public function update(int $id, Request $request): \Illuminate\Http\JsonResponse
     {
+		$login = Login::where([
+			['id', '=', $id]
+		])->first();
+		if (!$login){
+            return response()->json(['error' => 'Resource does not exist.'], HttpStatus::STATUS_BAD_REQUEST);
+		}
 		$authenticatedUser = Auth::user();
         // Check if currently authenticated user is the owner of the login
-        if (!$authenticatedUser || $authenticatedUser['id'] !== $login->user_id) {
+        if (!$authenticatedUser || $authenticatedUser['id'] !== $login['user_id']) {
             return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
         }
         $request->validate([
-            'websiteName'    => ['string', 'max:255'],
+            'websiteName'    => ['string', 'max:30'],
             'websiteAddress' => ['string', 'max:255', 'url'],
             'username'       => ['string', 'max:255'],
             'password'       => ['string', 'max:255']
@@ -102,12 +122,18 @@ class LoginController extends Controller
 
     /**
      * Remove the specified account from storage.
-     * @param	Login $login
+     * @param	int $id
      * @return  \Illuminate\Http\JsonResponse
      * @throws  \Exception
      */
-    public function destroy(Login $login): \Illuminate\Http\JsonResponse
+    public function destroy(int $id): \Illuminate\Http\JsonResponse
     {
+		$login = Login::where([
+			['id', '=', $id]
+		])->first();
+		if (!$login){
+            return response()->json(['error' => 'Resource does not exist.'], HttpStatus::STATUS_BAD_REQUEST);
+		}
 		$authenticatedUser = Auth::user();
         // Check if currently authenticated user is the owner of the login
         if (!$authenticatedUser || $authenticatedUser['id'] !== $login->user_id) {

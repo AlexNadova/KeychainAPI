@@ -61,10 +61,10 @@ class UserController extends Controller
 			'name' => 'required|regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
 			'surname' => 'required|regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
 			'email' => 'required|string|unique:users,email|email',
-			'password' => 'required|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})(?!.*[^a-zA-Z0-9]).{8,}/|string',
+			'password' => 'required|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/|string',
 			'c_password' => 'required|same:password',
 		]);
-		$input = $request->all();
+		$input = $request->only('name', 'surname', 'email', 'password');
 		//hash password with L Hash facade (authController takes care of veryfying Bcrypt 
 		//password against the un-hashed version provided by user)
 		$input['password'] = bcrypt($input['password']);
@@ -82,7 +82,6 @@ class UserController extends Controller
 		}else{
 			return response()->json(['error' => 'User could not be registered.'], HttpStatus::STATUS_INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 
 	/**
@@ -108,8 +107,8 @@ class UserController extends Controller
 		$request->validate([
 			'name' => 'regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
 			'surname' => 'regex:/^[a-zA-Zá-žÁ-Ž]{2,17}$/|string',
-			'password' => 'regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})(?!.*[^a-zA-Z0-9]).{8,}/|string',
-			'c_password' => 'same:password',
+			'password' => 'regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/|string',
+			'c_password' => 'same:password|required_with:password',
 		]);
 		$authenticatedUser = Auth::user();
 		if($authenticatedUser){
@@ -118,7 +117,7 @@ class UserController extends Controller
 				$request['password'] = bcrypt($request['password']);
 			}
 			//update user
-			$authenticatedUser->update($request->all());
+			$authenticatedUser->update($request->only('name', 'surname', 'password'));
 			return response()->json([
 				'message' => 'User was updated.',
 				'data' => new UserResource($authenticatedUser)

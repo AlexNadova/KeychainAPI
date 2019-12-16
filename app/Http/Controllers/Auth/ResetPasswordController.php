@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 class PasswordResetController extends Controller
 {
     /**
-     * Create token password reset
+     * For updating password in cases user doesn't remember old password. Create token password reset
      * @param  Request $request (string : $email)
      * @return \Illuminate\Http\JsonResponse
      */
@@ -51,8 +51,8 @@ class PasswordResetController extends Controller
     {
         $request->validate([
             'email' => 'required|string|email',
-			'password' => 'required|string',
-			'c_password' => 'required|same:password',
+			'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/',
+			'c_password' => 'required|same:password|required_with:password',
             'token' => 'required|string'
 		]);
 		$passwordReset = PasswordReset::where([

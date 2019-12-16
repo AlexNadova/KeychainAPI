@@ -95,18 +95,18 @@ class VerificationController extends Controller
             $emailVerify->delete();
             return response()->json(['error' => 'This e-mail verification token is invalid.'], HttpStatus::STATUS_UNAUTHORIZED);
 		}
-		//if user with given new email exist, error
-		$userCheck = User::where([
-			['email', '=', $request["email"]],
-			['id', '<>', $authenticatedUser['id']]
-		])->first();
-		if ($userCheck) {
-			return response()->json(['error' => 'This email is already in use.'], HttpStatus::STATUS_BAD_REQUEST);
-		}
 		//find user by id
 		$user = User::where('id', $emailVerify->user_id)->first();
 		if (!$user) {
 			return response()->json(['error' => 'We cannnot find a user with that ID.'], HttpStatus::STATUS_BAD_REQUEST);
+		}
+		//if user with given new email exist, error
+		$userCheck = User::where([
+			['email', '=', $emailVerify->email_update],
+			['id', '<>', $user->id]
+		])->first();
+		if ($userCheck) {
+			return response()->json(['error' => 'This email is already in use.'], HttpStatus::STATUS_CONFLICT);
 		}
 		$user->email = $emailVerify->email_update;
 		$user->email_verified_at = new DateTime();
