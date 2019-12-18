@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Auth;use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Notifications\PasswordResetRequest;
 use App\Notifications\PasswordResetSuccess;
 use App\User;
 use App\Helpers\HttpStatus;
 use App\PasswordReset;
-use Illuminate\Support\Str;
 
 class PasswordResetController extends Controller
 {
@@ -30,11 +30,15 @@ class PasswordResetController extends Controller
 		if (!$user) {
 			return response()->json(['error' => 'We cannot find a user with that e-mail address.'], HttpStatus::STATUS_BAD_REQUEST);
 		}
+		$passwordReset = PasswordReset::where('email', $user->email)->first();
+		if($passwordReset){
+			$passwordReset->delete();
+		}
 		//create passwordreset with random token
-		$passwordReset = PasswordReset::updateOrCreate(
-            ['email' => $user->email,
-            'token' => Str::random(60)]
-		);
+		$passwordReset = PasswordReset::updateOrCreate([
+			'email' => $user->email,
+			'token' => Str::random(60)
+		]);
 		//if user and passwordReset exits, send email (notify) and return message
 		if ($user && $passwordReset){
 			$user->notify(new PasswordResetRequest($passwordReset->token));
