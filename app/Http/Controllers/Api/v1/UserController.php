@@ -24,12 +24,12 @@ class UserController extends Controller
 		$user = User::where([
 			['email', '=', request('email')]
 		])->first();
-		if (is_null($user['email_verified_at'])){
-			return response()->json(['error' => 'You first need to verify your email.'], HttpStatus::STATUS_FORBIDDEN);
-		}
 		if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
+			if (is_null($user['email_verified_at'])){
+				return response()->json(['error' => 'You first need to verify your email.'], HttpStatus::STATUS_UNAUTHORIZED);
+			}
 			$user = Auth::user();
-			$success['token'] =  $user->createToken('eddie')->accessToken;
+			$success['token'] =  $user->createToken($user->email)->accessToken;
 			return response()->json(['success' => $success], HttpStatus::STATUS_OK);
 		} else {
 			return response()->json(['error' => 'User could not be authenticated.'], HttpStatus::STATUS_UNAUTHORIZED);
@@ -92,9 +92,9 @@ class UserController extends Controller
 	{
 		$authenticatedUser = Auth::user();
 		if($authenticatedUser){
-			return response()->json(['data' => new UserResource($authenticatedUser)], HttpStatus::STATUS_OK);
+			return response()->json(['data' => new UserResource($authenticatedUser),], HttpStatus::STATUS_OK);
 		}else{
-			return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
+			return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_UNAUTHORIZED);
 		}
 	}
 
@@ -139,7 +139,7 @@ class UserController extends Controller
 			DB::table('oauth_access_tokens')->where('user_id', $authenticatedUser['id'])->delete();
 			return response()->json(['success' => 'User was deleted successfully.'], HttpStatus::STATUS_OK);
 		}else{
-			return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
+			return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_UNAUTHORIZED);
 		}
 	}
 }
