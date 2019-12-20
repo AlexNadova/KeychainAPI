@@ -13,7 +13,6 @@ use App\User;
 class ResetPasswordUnitTests extends ResetPasswordTestCase
 {
 	public $route = 'http://127.0.0.1:8000/api/v1';
-	public $user;
 
 	public function createUser() {
 		$userCheck = User::where([
@@ -107,7 +106,8 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 					'The email must be a string.',
        				'The email must be a valid email address.'
 			  	]
-			]		]);
+			]		
+		]);
 		$this->assertDatabaseMissing('password_resets',[
 			'email' => 1,
 		]);
