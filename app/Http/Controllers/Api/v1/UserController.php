@@ -24,7 +24,7 @@ class UserController extends Controller
 		$user = User::where([
 			['email', '=', request('email')]
 		])->first();
-		if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
+		if (Auth::guard('web')->attempt(['email' => request('email'), 'password' => request('password')])) {
 			if (is_null($user['email_verified_at'])){
 				return response()->json(['error' => 'You first need to verify your email.'], HttpStatus::STATUS_UNAUTHORIZED);
 			}

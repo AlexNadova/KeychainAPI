@@ -17,8 +17,8 @@ class CreateLoginsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id'); //->index()->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('websiteName');
-            $table->string('websiteAddress');
+            $table->string('website_name');
+            $table->string('website_address');
             $table->string('username');
             $table->string('password');
             $table->timestamps();

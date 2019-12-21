@@ -19,8 +19,8 @@ class LoginResource extends JsonResource
             // Don't display id and user_id in deployment.
             "id" => $this->id,
             "user_id" => $this->user_id,
-            "websiteName" => $this->websiteName,
-            "websiteAddress" => $this->websiteAddress,
+            "website_name" => $this->website_name,
+            "website_address" => $this->website_address,
             'username' => $this->username,
             'password' => $this->password,
             'created_at' => (string) $this->created_at,

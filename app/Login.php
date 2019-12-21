@@ -16,8 +16,8 @@ class Login extends Model
      */
     protected $fillable = [
         'user_id',
-        'websiteName',
-        'websiteAddress',
+        'website_name',
+        'website_address',
         'username',
         'password'
     ];

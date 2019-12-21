@@ -26,6 +26,7 @@ class LoginController extends Controller
 		$logins = Login::where([
 			['user_id', '=', $authenticatedUser->id]
 		])->paginate(5);
+		
 		if ($logins->total() === 0){
 			return response()->json(['error' => 'User does not own any logins.'], HttpStatus::STATUS_BAD_REQUEST);
 		}
@@ -34,7 +35,7 @@ class LoginController extends Controller
 
     /**
      * Store a newly created login to DB.
-     * @param  \Illuminate\Http\Request $request (string: websiteName, websiteAddress, username, password)
+     * @param  \Illuminate\Http\Request $request (string: website_name, website_address, username, password)
      * @return  \Illuminate\Http\JsonResponse
      */
     public function store(Request $request): \Illuminate\Http\JsonResponse
@@ -45,22 +46,22 @@ class LoginController extends Controller
          * and a proper error response/ message will be sent back to the user.
          */
         $request->validate([
-            'websiteName'    => ['required', 'string', 'max:30'],
-            'websiteAddress' => ['required', 'string', 'max:255', 'url'],
+            'website_name'    => ['required', 'string', 'max:30'],
+            'website_address' => ['required', 'string', 'max:255', 'url'],
             'username'       => ['required', 'string', 'max:255'],
             'password'       => ['required', 'string', 'max:255']
         ]);
-
+		$authenticatedUser = Auth::user();
         // Create a new login.
         $login = Login::create([
-            'user_id' => $request->user()->id,
-            'websiteName' => $request['websiteName'],
-            'websiteAddress' => $request['websiteAddress'],
+            'user_id' => $authenticatedUser['id'],
+            'website_name' => $request['website_name'],
+            'website_address' => $request['website_address'],
             'username' => $request['username'],
             'password' => $request['password'],
 		]);
 		if($login){
-			return response()->json(['data' => new LoginResource($login)], HttpStatus::STATUS_CREATED);
+			return response()->json(['success' => 'Login was created.'], HttpStatus::STATUS_CREATED);
 		}
 		return response()->json(['error' => 'Login could not be saved.'], HttpStatus::STATUS_INTERNAL_SERVER_ERROR);
     }
@@ -90,7 +91,7 @@ class LoginController extends Controller
     /**
      * Update the specified login in storage.
      * @param   int $id
-     * @param   Request $request (string: websiteName, websiteAddress, username, password)
+     * @param   Request $request (string: website_name, website_address, username, password)
      * @return  \Illuminate\Http\JsonResponse
      */
     public function update(int $id, Request $request): \Illuminate\Http\JsonResponse
@@ -107,13 +108,13 @@ class LoginController extends Controller
             return response()->json(['error' => 'You cannot access this resource.'], HttpStatus::STATUS_FORBIDDEN);
         }
         $request->validate([
-            'websiteName'    => ['string', 'max:30'],
-            'websiteAddress' => ['string', 'max:255', 'url'],
+            'website_name'    => ['string', 'max:30'],
+            'website_address' => ['string', 'max:255', 'url'],
             'username'       => ['string', 'max:255'],
             'password'       => ['string', 'max:255']
         ]);
         // Update the login
-		$login->update($request->only(['websiteName', 'websiteAddress', 'username', 'password']));
+		$login->update($request->only(['website_name', 'website_address', 'username', 'password']));
 		return response()->json([
 			'message' => 'Login was updated.',
 			'data' => new LoginResource($login)
