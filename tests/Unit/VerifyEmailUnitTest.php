@@ -78,7 +78,6 @@ class VerifyEmailUnitTests extends VerifyEmailTestCase
 			'email_update' => $newEmail
 		]);
 	}
-
 	/**
 	 *  TVE2: test email verification; wrong - field empty
 	 *  @return void
