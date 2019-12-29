@@ -19,6 +19,7 @@ class CreateLoginsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('website_name');
             $table->string('website_address');
+            $table->string('domain');
             $table->string('username');
             $table->string('password');
             $table->timestamps();

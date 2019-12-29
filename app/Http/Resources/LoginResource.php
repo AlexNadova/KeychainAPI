@@ -21,6 +21,7 @@ class LoginResource extends JsonResource
             "user_id" => $this->user_id,
             "website_name" => $this->website_name,
             "website_address" => $this->website_address,
+            "domain" => $this->domain,
             'username' => $this->username,
             'password' => $this->password,
             'created_at' => (string) $this->created_at,

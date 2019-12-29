@@ -17,7 +17,8 @@ class Login extends Model
     protected $fillable = [
         'user_id',
         'website_name',
-        'website_address',
+		'website_address',
+		'domain',
         'username',
         'password'
     ];
@@ -28,7 +29,7 @@ class Login extends Model
     }
 
     // Get
-    public function getUserNameAttribute($value)
+    public function getUsernameAttribute($value)
     {
         try {
             return Crypt::decryptString($value);
@@ -48,7 +49,7 @@ class Login extends Model
 
     // Set
 
-    public function setUserNameAttribute($value)
+    public function setUsernameAttribute($value)
     {
         $this->attributes['username'] = Crypt::encryptString($value);
     }

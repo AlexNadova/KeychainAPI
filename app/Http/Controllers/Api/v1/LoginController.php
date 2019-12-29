@@ -48,15 +48,17 @@ class LoginController extends Controller
         $request->validate([
             'website_name'    => ['required', 'string', 'max:30'],
             'website_address' => ['required', 'string', 'max:255', 'url'],
-            'username'       => ['required', 'string', 'max:255'],
-            'password'       => ['required', 'string', 'max:255']
+            'username'       => ['required', 'string', 'max:45'],
+            'password'       => ['required', 'string', 'max:45']
         ]);
 		$authenticatedUser = Auth::user();
+		$domain = $this->parse_url_all($request['website_address']);
         // Create a new login.
         $login = Login::create([
             'user_id' => $authenticatedUser['id'],
             'website_name' => $request['website_name'],
-            'website_address' => $request['website_address'],
+			'website_address' => $request['website_address'],
+			'domain' => $domain['domain'],
             'username' => $request['username'],
             'password' => $request['password'],
 		]);
@@ -110,9 +112,14 @@ class LoginController extends Controller
         $request->validate([
             'website_name'    => ['string', 'max:30'],
             'website_address' => ['string', 'max:255', 'url'],
-            'username'       => ['string', 'max:255'],
-            'password'       => ['string', 'max:255']
-        ]);
+            'username'       => ['string', 'max:45'],
+            'password'       => ['string', 'max:45']
+		]);
+		if(isset($request['website_address'])){
+			$domain = $this->parse_url_all($request['website_address']);
+			$login->domain = $domain['domain'];
+			$login->save();
+		}
         // Update the login
 		$login->update($request->only(['website_name', 'website_address', 'username', 'password']));
 		return response()->json([
@@ -144,5 +151,25 @@ class LoginController extends Controller
 			$login->delete();
 			return response()->json(['success' => 'Login was deleted successfully.'], HttpStatus::STATUS_OK);
 		}
-    }
+	}
+	
+	/**
+	 * https://stackoverflow.com/a/45044051
+	 */
+	function parse_url_all($url){
+		$url = substr($url,0,4)=='http'? $url: 'http://'.$url;
+		$d = parse_url($url);
+		$tmp = explode('.',$d['host']);
+		$n = count($tmp);
+		if ($n>=2){
+			if ($n==4 || ($n==3 && strlen($tmp[($n-2)])<=3)){
+				$d['domain'] = $tmp[($n-3)].".".$tmp[($n-2)].".".$tmp[($n-1)];
+				$d['domainX'] = $tmp[($n-3)];
+			} else {
+				$d['domain'] = $tmp[($n-2)].".".$tmp[($n-1)];
+				$d['domainX'] = $tmp[($n-2)];
+			}
+		}
+		return $d;
+	}
 }
