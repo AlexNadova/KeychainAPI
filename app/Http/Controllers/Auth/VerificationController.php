@@ -69,6 +69,7 @@ class VerificationController extends Controller
 			]);
 		//if user and passwordReset exits, send email (notify) and return message
 		if ($user && $emailVerify){
+			$user['email'] = $request->email_update;
 			$user->notify(new EmailVerificationRequest($emailVerify->token));
 			return response()->json(['message' => 'We have e-mailed you your e-mail verification link!'], HttpStatus::STATUS_OK);
 		}
@@ -76,16 +77,13 @@ class VerificationController extends Controller
 
 	/**
      * Verify email
-     * @param  Request $request (string: user_id, token)
+     * @param  
      * @return \Illuminate\Http\JsonResponse
      */
-    public function verify(Request $request): \Illuminate\Http\JsonResponse
+    public function verify(string $token): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'token' => 'required|string'
-		]);
 		$emailVerify = EmailVerification::where([
-			['token', $request->token]
+			['token', $token]
 		])->first();
 		if (!$emailVerify) {
 			return response()->json(['error' => 'This e-mail verification token is invalid.'], HttpStatus::STATUS_UNAUTHORIZED);

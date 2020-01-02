@@ -29,11 +29,9 @@ Route::prefix('v1')->group(function () {
 		'prefix' => 'password'
 	], function(){
 		Route::post('create','PasswordResetController@create');
-		// Route::get('find/{token}','PasswordResetController@find');
 		Route::post('reset','PasswordResetController@reset');
 	});
-	//!!! email verification: probably will need remake after frontend is implemented
-	Route::post('email/verify','Auth\VerificationController@verify');
+	Route::get('email/verify/{token}','Auth\VerificationController@verify');
 
 	//use authentication middleware to protect these routes
 	Route::group(['middleware' => 'auth:api'], function () {
