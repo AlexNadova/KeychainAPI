@@ -33,9 +33,6 @@ abstract class VerifyEmailTestCase extends TestCase
 	// TVE8: test email verification; wrong - email verification token not given
 	public function testEmailVerificationTokenNotGiven(): void { }
 
-	// TVE9: test email verification; wrong - token is of wrong type (should be string)
-	public function testEmailVerificationTokenWrongType(): void { }
-
 	// TVE10: test email verification; wrong - token not found in DB
 	public function testEmailVerificationTokenNotFound(): void { }
 

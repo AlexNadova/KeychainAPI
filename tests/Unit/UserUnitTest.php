@@ -3,11 +3,9 @@
 namespace Tests\Unit;
 
 use Laravel\Passport\Passport;
-use Illuminate\Support\Facades\DB;
 use Tests\Testcases\UserTestCase;
 use App\Helpers\HttpStatus;
 use App\User;
-use DateTime;
 
 class UserUnitTests extends UserTestCase
 {

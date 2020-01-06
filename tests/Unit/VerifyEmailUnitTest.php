@@ -234,8 +234,7 @@ class VerifyEmailUnitTests extends VerifyEmailTestCase
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
-		])->postJson($this->route.'/email/verify', [
-			'token' => $token->token]);
+		])->getJson($this->route.'/email/verify/'.$token->token);
 		$response->assertStatus(HttpStatus::STATUS_OK);
 		$response->assertJson([
 			'message' => 'Your e-mail has been verified. Proceed to login.'
@@ -256,45 +255,9 @@ class VerifyEmailUnitTests extends VerifyEmailTestCase
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
-		])->postJson($this->route.'/email/verify');
-		$response->assertStatus(HttpStatus::STATUS_UNPROCESSABLE_ENTITY);
-		$response->assertJson([
-			'message' => 'The given data was invalid.',
-			'errors' => [
-				'token' => [
-					'The token field is required.'
-				]
-			]
-		]);
+		])->getJson($this->route.'/email/verify/');
+		$response->assertStatus(HttpStatus::STATUS_NOT_FOUND);
 		$this->assertDatabaseMissing('users',[
-			'id' => $user->id,
-			'email' => $newEmail
-		]);
-	}
-
-	/**
-	 *  TVE9: test email verification; wrong - token is of wrong type (should be string)
-	 *  @return void
-	 */
-	public function testEmailVerificationTokenWrongType(): void {
-		$user = $this->createUser();
-		$newEmail = 'cottagecheese@somewebsite.net';
-		$response = $this->withHeaders([
-			'Accept' => 'application/json',
-			'Content-Type' => 'application/json',
-		])->postJson($this->route.'/email/verify',[
-			'token' => 1
-		]);
-		$response->assertStatus(HttpStatus::STATUS_UNPROCESSABLE_ENTITY);
-		$response->assertJson([
-			'message' => 'The given data was invalid.',
-			'errors' => [
-				'token' => [
-					'The token must be a string.'
-				]
-			]
-		]);
-		$this->assertDatabaseMissing('users', [
 			'id' => $user->id,
 			'email' => $newEmail
 		]);
@@ -307,12 +270,11 @@ class VerifyEmailUnitTests extends VerifyEmailTestCase
 	public function testEmailVerificationTokenNotFound(): void {
 		$user = $this->createUser();
 		$newEmail = 'xXxcottagecheesexXx@website.net';
+		$token = Str::random(60);
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
-		])->postJson($this->route.'/email/verify',[
-			'token' => Str::random(60)
-		]);
+		])->getJson($this->route.'/email/verify/'.$token);
 		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
 		$response->assertJson([
 			'error' => 'This e-mail verification token is invalid.'
@@ -336,9 +298,7 @@ class VerifyEmailUnitTests extends VerifyEmailTestCase
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
-		])->postJson($this->route.'/email/verify',[
-			'token' => $token->token
-		]);
+		])->getJson($this->route.'/email/verify/'.$token->token);
 		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
 		$response->assertJson([
 			'error' => 'This e-mail verification token is invalid.'
@@ -361,9 +321,7 @@ class VerifyEmailUnitTests extends VerifyEmailTestCase
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
-		])->postJson($this->route.'/email/verify',[
-			'token' => $token->token
-		]);
+		])->getJson($this->route.'/email/verify/'.$token->token);
 		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
 		$response->assertJson([
 			'error' => 'This e-mail verification token is invalid.'
@@ -391,9 +349,7 @@ class VerifyEmailUnitTests extends VerifyEmailTestCase
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
-		])->postJson($this->route.'/email/verify',[
-			'token' => $token->token
-		]);
+		])->getJson($this->route.'/email/verify/'.$token->token);
 		$response->assertStatus(HttpStatus::STATUS_CONFLICT);
 		$response->assertJson([
 			'error' => 'This email is already in use.'

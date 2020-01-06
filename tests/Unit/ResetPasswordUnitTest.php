@@ -57,7 +57,9 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/create', [
-			'email' => $user->email]);
+			'email' => $user->email,
+			'url' => 'https://website.com/reset-password?token=vyhsv156s4vbsz'
+		]);
 		$response->assertStatus(HttpStatus::STATUS_OK);
 		$response->assertJson([
 			'message' => 'We have e-mailed you your password reset link!',
@@ -77,7 +79,9 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/create', [
-			'email' => 'wrong.mail@website.com']);
+			'email' => 'wrong.mail@website.com',
+			'url' => 'https://website.com/reset-password?token=vyhsv156s4vbsz'
+		]);
 		$response->assertStatus(HttpStatus::STATUS_BAD_REQUEST);
 		$response->assertJson([
 			'error' => 'We cannot find a user with that e-mail address.',
@@ -88,16 +92,18 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 	}
 	
 	/**
-	 *  TRP3: test password reset; wrong - email has wrong type
+	 *  TRP3: test password reset; wrong - values have wrong type
 	 * 	@return void
 	 */
-	public function testPasswordResetCreateEmailWrongType(): void {
+	public function testPasswordResetCreateValuesWrongType(): void {
 		$user = $this->createUser();
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/create', [
-			'email' => 1]);
+			'email' => 1,
+			'url' => false
+		]);
 		$response->assertStatus(HttpStatus::STATUS_UNPROCESSABLE_ENTITY);
 		$response->assertJson([
 			'message' => 'The given data was invalid.',
@@ -105,19 +111,23 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 				'email' => [
 					'The email must be a string.',
        				'The email must be a valid email address.'
+				],
+				'url' => [
+					'The url must be a string.',
+					'The url format is invalid.'
 			  	]
 			]		
 		]);
 		$this->assertDatabaseMissing('password_resets',[
-			'email' => 1,
+			'email' => 1
 		]);
 	}
 	
 	/**
-	 *TRP4: test password reset; wrong - email not given
+	 *TRP4: test password reset; wrong - values not given
 	 * 	@return void
 	 */
-	public function testPasswordResetCreateEmailNotGiven(): void {
+	public function testPasswordResetCreateValuesNotGiven(): void {
 		$response = $this->withHeaders([
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
@@ -128,6 +138,9 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'errors' => [
 				'email' => [
 					'The email field is required.'
+				],
+				'url' => [
+					'The url field is required.'
 			  	]
 			]
 		]);
@@ -146,7 +159,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => 'NewPassword1',
 			'c_password' => 'NewPassword1',
 			'token' => $passwordReset->token]);
@@ -169,9 +181,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 		$response->assertJson([
 			'message'=> 'The given data was invalid.',
 			'errors'=> [
-				'email' => [
-					'The email field is required.'
-				],
 				'password' => [
 					'The password field is required.'
 				],
@@ -196,7 +205,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => 1,
 			'password' => ['a'],
 			'c_password' => ['a'],
 			'token' => false]);
@@ -204,10 +212,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 		$response->assertJson([
 			'message'=> 'The given data was invalid.',
 			'errors'=> [
-				'email' => [
-					'The email must be a string.',
-					'The email must be a valid email address.'
-				],
 				'password' => [
 					'The password must be a string.',
 					'The password format is invalid.'
@@ -230,7 +234,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => 'NewPassword1',
 			'c_password' => 'NewPassword',
 			'token' => $passwordReset->token]);
@@ -256,7 +259,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => 'onlylowercase',
 			'c_password' => 'onlylowercase',
 			'token' => $passwordReset->token]);
@@ -282,7 +284,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => 'ONLYUPPERCASE',
 			'c_password' => 'ONLYUPPERCASE',
 			'token' => $passwordReset->token]);
@@ -308,7 +309,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => '0123456789',
 			'c_password' => '0123456789',
 			'token' => $passwordReset->token]);
@@ -330,7 +330,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => 'SafePassword1',
 			'c_password' => 'SafePassword1',
 			'token' => Str::random(60)]);
@@ -350,7 +349,6 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => 'SafePassword1',
 			'c_password' => 'SafePassword1',
 			'token' => $passwordReset->token]);
@@ -369,13 +367,12 @@ class ResetPasswordUnitTests extends ResetPasswordTestCase
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		])->postJson($this->route.'/password/reset', [
-			'email' => $user->email,
 			'password' => 'SafePassword1',
 			'c_password' => 'SafePassword1',
-			'token' => Str::random(60)]);
-		$response->assertStatus(HttpStatus::STATUS_UNAUTHORIZED);
+			'token' => $passwordReset->token]);
+		$response->assertStatus(HttpStatus::STATUS_NOT_FOUND);
 		$response->assertJson([
-			'error' => 'This password reset token is invalid.',
+			'error' => 'We cannnot find a user with that e-mail address.',
 		]);
 	}
 }

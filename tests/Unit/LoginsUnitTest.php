@@ -3,8 +3,6 @@
 namespace Tests\Unit;
 
 use Laravel\Passport\Passport;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Tests\Testcases\LoginsTestCase;
 use App\Helpers\HttpStatus;
@@ -20,7 +18,8 @@ class LoginsUnitTests extends LoginsTestCase{
 				'name' => 'Buckminster',
 				'surname' => 'Wafflesmack',
 				'email' => 'wafflesmack@website.com',
-				'password' => bcrypt('SafePassword1')
+				'password' => bcrypt('SafePassword1'),
+				'email_updated_at' => now()
 			];
 		}
 		$userCheck = User::where([
@@ -28,8 +27,6 @@ class LoginsUnitTests extends LoginsTestCase{
 		])->first();
 		if(!$userCheck){
 			$user = User::create($user);
-			$user->email_verified_at = now();
-			$user->update();
 			return $user;
 		}
 		return $userCheck;
@@ -41,6 +38,7 @@ class LoginsUnitTests extends LoginsTestCase{
 				'user_id' => $id,
 				'website_name' => 'Gmail',
 				'website_address' => 'https://gmail.com',
+				'domain' => 'gmail.com',
 				'username' => 'buckminster@gmail.com',
 				'password' => 'password'
 			];
@@ -239,8 +237,8 @@ class LoginsUnitTests extends LoginsTestCase{
 		$login = [
 			'website_name' => Str::random(31),
 			'website_address' => Str::random(256),
-			'username' => Str::random(256),
-			'password' => Str::random(256)
+			'username' => Str::random(46),
+			'password' => Str::random(46)
 		];
 		Passport::actingAs($user);
 		$response = $this->withHeaders([
@@ -259,10 +257,10 @@ class LoginsUnitTests extends LoginsTestCase{
 					"The website address format is invalid."
 				],
 				"username" => [
-					"The username may not be greater than 255 characters."
+					"The username may not be greater than 45 characters."
 				],
 				"password" => [
-					"The password may not be greater than 255 characters."
+					"The password may not be greater than 45 characters."
 				]
 			]
 		]);
@@ -658,8 +656,8 @@ class LoginsUnitTests extends LoginsTestCase{
 		$updatedLogin = [
 			'website_name' => Str::random(31),
 			'website_address' => Str::random(256),
-			'username' => Str::random(256),
-			'password' => Str::random(256)
+			'username' => Str::random(46),
+			'password' => Str::random(46)
 		];
 		Passport::actingAs($user);
 		$response = $this->withHeaders([
@@ -678,10 +676,10 @@ class LoginsUnitTests extends LoginsTestCase{
 					"The website address format is invalid."
 				],
 				"username" => [
-					"The username may not be greater than 255 characters."
+					"The username may not be greater than 45 characters."
 				],
 				"password" => [
-					"The password may not be greater than 255 characters."
+					"The password may not be greater than 45 characters."
 				]
 			]
 		]);
@@ -772,4 +770,8 @@ class LoginsUnitTests extends LoginsTestCase{
 			'id' => $login->id
 		]);
 	}
+
+	//-----------------------------------------------DOMAIN-----------------------------------------------
+
+
 }

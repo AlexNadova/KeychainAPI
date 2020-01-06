@@ -15,11 +15,11 @@ abstract class ResetPasswordTestCase extends TestCase
 	// TRP2: test password reset; wrong - email doesn't exist in DB
 	public function testPasswordResetCreateEmailNotFound(): void { }
 
-	// TRP3: test password reset; wrong - email has wrong type
-	public function testPasswordResetCreateEmailWrongType(): void { }
+	// TRP3: test password reset; wrong - values have wrong type
+	public function testPasswordResetCreateValuesWrongType(): void { }
 
-	// TRP4: test password reset; wrong - email not given
-	public function testPasswordResetCreateEmailNotGiven(): void { }
+	// TRP4: test password reset; wrong - values not given
+	public function testPasswordResetCreateValuesNotGiven(): void { }
 
 	// TRP5: test password reset; correct
 	public function testPasswordReset(): void { }

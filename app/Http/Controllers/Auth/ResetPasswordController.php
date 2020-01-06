@@ -73,7 +73,7 @@ class PasswordResetController extends Controller
 		//find user by email
 		$user = User::where('email', $passwordReset->email)->first();        
 		if (!$user) {
-			return response()->json(['error' => 'We cannnot find a user with that e-mail address.'], HttpStatus::STATUS_BAD_REQUEST);
+			return response()->json(['error' => 'We cannnot find a user with that e-mail address.'], HttpStatus::STATUS_NOT_FOUND);
 		}
 		$user->password = bcrypt($request->password);
 		$user->save();
